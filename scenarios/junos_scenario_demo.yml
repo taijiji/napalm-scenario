@@ -3,11 +3,11 @@ purpus:
     拠点Aでプライベートピアを構築することを目的としている。
     経路交換は1経路ずつ受信/送信を行う予定であり、作業による
     ネットワークの影響は軽微である。
-operator: ToshiyaMabuchi
-operation_date: 20161115
+operator: Taiji Tsuciya
+operation_date: 20180125
 hosts:
-  management_ipaddress: 192.168.33.2
-  hostname: firefly1
+  management_ipaddress: 192.168.33.3
+  hostname: vsrx
   os : junos
   username: user1
   password: password1

@@ -17,17 +17,17 @@ demo: configuring interface and BGP neighbor setting
 # How to run
 
 ```
-python run_scenario.py -f <scenario file>
+python3 run_scenario.py -f <scenario file>
 ```
 
 ## Sccenarip Sample file
 
 ```
 purpus: this is sample operation.
-operator: Toshiya Mabuchi
-operation_date: 20170621
+operator: Taiji Tsuchiya
+operation_date: 20180125
 hosts:
-  management_ipaddress: 10.10.10.1
+  management_ipaddress: 192.168.33.3
   hostname: sample1
   os : iosxr
   username: user1

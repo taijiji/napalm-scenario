@@ -109,7 +109,7 @@ def main():
         username    = param['hosts']['username'],
         password    = param['hosts']['password'])
 
-    print(Fore.BLUE+'########## Run Senario : ' + args.file + ' ##########')
+    print('########## Run Senario : ' + args.file + ' ##########')
 
     print('operator : %s'       % (param['operator']))
     print('operation_date : %d' % (param['operation_date']))
@@ -139,7 +139,7 @@ def main():
             operation_param = None
 
         if 'validate' == operation_name:
-            print(Fore.BLUE+'Pre-Validation Start : {0}'.center(50,'=').format(param['hosts']['hostname']))
+            print('Pre-Validation Start : {0}'.center(50,'=').format(param['hosts']['hostname']))
             if operation_param:
                 complies_result = router1.validate_operation(operation_param)
             else:
@@ -162,13 +162,13 @@ def main():
                     rollback_operation(router1,backup_configs['running'])
 
         elif 'get_' in operation_name:
-            print(Fore.BLUE+'Get and show command : {0}'.center(50,'=').format(param['hosts']['hostname']))
+            print('Get and show command : {0}'.center(50,'=').format(param['hosts']['hostname']))
             print('GET <%s> : '%(operation_name))
             result = router1.call_getters(operation_name,operation_param)
             pprint(result)
 
         elif 'set_' in operation_name:
-            print(Fore.BLUE+'Set Config : {0}'.center(50,'=').format(param['hosts']['hostname']))  
+            print('Set Config : {0}'.center(50,'=').format(param['hosts']['hostname']))  
             result, message =\
                 router1.load_config(operation_name, operation_param)
             print_bool_result(result,'Fore')
@@ -182,7 +182,7 @@ def main():
                 print(Back.RED + 'Config load error! Operation is Rollbacked...')
                 rollback_operation(router1,backup_configs['running'])
 
-            print(Fore.BLUE+'Compare Config : {0}'.center(50,'=').format(param['hosts']['hostname']))
+            print('Compare Config : {0}'.center(50,'=').format(param['hosts']['hostname']))
             print('Compare config on < {0} >'.format(operation_name))
             message = router1.compare_config()
             if message != '':
@@ -221,7 +221,7 @@ def main():
         print_bool_result(False,'Back')
     print('Close the connection to ' + param['hosts']['hostname'])
 
-    print(Fore.BLUE+'########## End Senario : ' + args.file + ' ##########')
+    print('########## End Senario : ' + args.file + ' ##########')
 
 if __name__ == '__main__':
     main()
