@@ -10,6 +10,7 @@ from colorama import Fore, Back, Style
 
 from router import Router
 
+
 def print_bool_result(binary_result,color_spec):
     """ 
     print boolean result.
@@ -21,6 +22,7 @@ def print_bool_result(binary_result,color_spec):
         print(eval(color_spec).GREEN + '[OK]' , end=' ')
     else:
         print(eval(color_spec).RED + '[NG]' , end=' ')
+
 
 def print_validate_fail_detail(compare_object,key=''):
     """
@@ -54,6 +56,7 @@ def input_judgment(message):
     else:
         return False
 
+
 def rollback_operation(device,config):
     try:
         device.discard_config()
@@ -70,6 +73,7 @@ def rollback_operation(device,config):
     finally:
         device.close()
         sys.exit()
+
 
 def load_senario(senario_filename):
     # Read senario file
@@ -92,46 +96,37 @@ def load_senario(senario_filename):
     return param
 
 
-def main():
-    """main function."""
-    # Set color font
-    colorama.init(autoreset=True)
+def run_scenario(router, senario_filename, param):
 
-    # Parse argment
-    parser = ArgumentParser(description='run scenario_file')
-    parser.add_argument('-f', '--file', type=str,
-                        help='scenario file', required=True)
-    args = parser.parse_args()
+    router_hostname     = param['hosts']['hostname']
+    operator_name       = param['operator']
+    operation_data      = param['operation_date']
+    operation_purpus    = param['purpus']
 
-    param = load_senario(args.file)
+    print('########## Run Senario : ' + senario_filename + ' ##########')
 
-    router1 = Router(
-        hostname    = param['hosts']['hostname'],
-        os          = param['hosts']['os'],
-        ipaddress   = param['hosts']['management_ipaddress'],
-        username    = param['hosts']['username'],
-        password    = param['hosts']['password'])
-
-    print('########## Run Senario : ' + args.file + ' ##########')
-
-    print('operator : %s'       % (param['operator']))
-    print('operation_date : %d' % (param['operation_date']))
-    print('hostname : %s'       % (param['hosts']['hostname']))
-    print('purpose :')
-    print(param['purpus'])
+    print('operator         : %s'   % (operator_name))
+    print('operation_date   : %d'   % (operation_data))
+    print('hostname         : %s'   % (router_hostname))
+    print('purpose          :\n%s'  % (operation_purpus))
     
-    if not router1.open():
+
+    # Connect to Router
+    if not router.open():
         print_bool_result(True,'Fore')
     else :
         print_bool_result(False,'Fore')
-    print('Connect to ' + param['hosts']['hostname'])
+    print('Connect to ' + router_hostname)
     
-    backup_configs = router1.get_config()
-    if backup_configs:
+
+    # Get current config of the router
+    config_before = router.get_config()
+    if config_before:
         print_bool_result(True,'Fore')
     else:
         print_bool_result(False,'Fore')
-    print('Save backup config')
+    print('Get config_before of ' + router_hostname)
+
 
     for scenario_param in param['scenario']:
         if isinstance(scenario_param, dict):
@@ -144,9 +139,9 @@ def main():
         if 'validate' == operation_name:
             print('Validation Start : {0}'.center(50,'=').format(param['hosts']['hostname']))
             if operation_param:
-                complies_result = router1.validate_operation(operation_param)
+                complies_result = router.validate_operation(operation_param)
             else:
-                complies_result = router1.validate_operation({operation_name:None})
+                complies_result = router.validate_operation({operation_name:None})
 
             #pprint(complies_result)
 
@@ -162,18 +157,18 @@ def main():
                         print_validate_fail_detail(complies_result[v])
             if not complies_result['complies']:
                 if not input_judgment('Validate is fail. Continue?'):
-                    rollback_operation(router1,backup_configs['running'])
+                    rollback_operation(router, config_before['running'])
 
         elif 'get_' in operation_name:
             print('Get and show command : {0}'.center(50,'=').format(param['hosts']['hostname']))
             print('GET <%s> : '%(operation_name))
-            result = router1.call_getters(operation_name,operation_param)
+            result = router.call_getters(operation_name,operation_param)
             pprint(result)
 
         elif 'set_' in operation_name:
             print('Set Config : {0}'.center(50,'=').format(param['hosts']['hostname']))  
             result, message =\
-                router1.load_config(operation_name, operation_param)
+                router.load_config(operation_name, operation_param)
             print_bool_result(result,'Fore')
             print('Load config on < {0} > '.format(operation_name))
             if result:
@@ -183,20 +178,20 @@ def main():
             else:
                 print(Back.RED + message)
                 print(Back.RED + 'Config load error! Operation is Rollbacked...')
-                rollback_operation(router1,backup_configs['running'])
+                rollback_operation(router, config_before['running'])
 
             print('Compare Config : {0}'.center(50,'=').format(param['hosts']['hostname']))
             print('Compare config on < {0} >'.format(operation_name))
-            message = router1.compare_config()
+            message = router.compare_config()
             if message != '':
                 print('-'*50)
                 print(Fore.YELLOW + message)
                 print('-'*50)
                 if input_judgment('Do you commit?'):
-                    print_bool_result(router1.commit(),'Fore')
+                    print_bool_result(router.commit(),'Fore')
                     print('Commit config')
                 else:
-                    rollback_operation(router1,backup_configs['running'])
+                    rollback_operation(router, config_before['running'])
             else:
                 print(Fore.YELLOW+'[INFO] No changes this router by {0} config'.format(operation_name))
 
@@ -211,20 +206,45 @@ def main():
                     print('.',end='')
 
         elif operation_name == 'rollback':
-            rollback_operation(router1,backup_configs['running'])
+            rollback_operation(router,config_before['running'])
             print_bool_result(True,'Back')
             print('Rollback Config!', end='')
 
         else:
             print('Cannnot run operation : '+Back.RED + operation_name)
     
-    if not router1.close():
+    if not router.close():
         print_bool_result(True,'Back')
     else:
         print_bool_result(False,'Back')
     print('Close the connection to ' + param['hosts']['hostname'])
 
     print('########## End Senario : ' + args.file + ' ##########')
+
+
+def main():
+    """main function."""
+    # Set color font
+    colorama.init(autoreset=True)
+
+    # Parse argment
+    parser = ArgumentParser(description='run scenario_file')
+    parser.add_argument('-f', '--file', type=str,
+                        help='scenario file', required=True)
+    args = parser.parse_args()
+
+    scenario_filename = args.file
+    param = load_senario(scenario_filename)
+
+    router1 = Router(
+        hostname    = param['hosts']['hostname'],
+        os          = param['hosts']['os'],
+        ipaddress   = param['hosts']['management_ipaddress'],
+        username    = param['hosts']['username'],
+        password    = param['hosts']['password'])
+
+    run_scenario(router1, scenario_filename, param)
+
 
 if __name__ == '__main__':
     main()
