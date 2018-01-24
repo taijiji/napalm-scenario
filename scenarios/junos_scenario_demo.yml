@@ -16,7 +16,7 @@ scenario:
       - facts:
           version: 12.1X47-D15.4
           hostname: vsrx1
-#      - bgp_summary
+      - bgp_summary
 #      - interfaces :
 #          admin: True
 #          physical: True

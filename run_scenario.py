@@ -132,15 +132,30 @@ def run_validate(router, operation_param, config_before):
     v_index = complies_result.keys()
 
     for v in v_index:
-        if v.startswith('get_'):
+        if v == 'get_facts':
             print_bool_result(complies_result[v]['complies'],'Fore')
             print('Validate {0}'.format(v))
             
-            if complies_result[v]['complies'] == False:
-                print(Fore.RED + str(complies_result[v]))
+            # Check OS veresion
+            if complies_result[v]['present']['os_version']['complies'] == True:
+                print(Fore.GREEN + 'os_version : ' + router.get_os_version())
+            else: 
+                print(Fore.RED + 'os_version : ')
+                print(Fore.RED + ' '*4 + 'expected_value : ' + complies_result[v]['present']['os_version']['expected_value'])
+                print(Fore.RED + ' '*4 + 'actual_value   : ' + complies_result[v]['present']['os_version']['actual_value'])
                 #print_validate_fail_detail(complies_result[v])
+            
+            # Check hostname
+            if complies_result[v]['present']['hostname']['complies'] == True:
+                print(Fore.GREEN + 'hostname : ' + router.get_hostname())
+            else:
+                print(Fore.RED + 'hostname : ')
+                print(Fore.RED + ' '*4 + 'expected_value : ' + complies_result[v]['present']['hostname']['expected_value'])
+                print(Fore.RED + ' '*4 + 'actual_value   : ' + complies_result[v]['present']['hostname']['actual_value'])
+                #print_validate_fail_detail(complies_result[v])
+                
     
-    if not complies_result['complies']:
+    if complies_result['complies'] == False:
         if not input_judgment('Validate is fail. Continue?'):
             rollback_operation(router, config_before['running'])
 

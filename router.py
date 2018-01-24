@@ -50,6 +50,13 @@ class Router:
         return True
 
 
+    def get_hostname(self):
+        return self.device.get_facts()['hostname']
+
+    def get_os_version(self):
+        return self.device.get_facts()['os_version']
+
+
     def check_hostname(self):
         hostname_fetched = self.device.get_facts()['hostname']
 
