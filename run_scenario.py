@@ -95,6 +95,18 @@ def load_senario(senario_filename):
     
     return param
 
+
+def get_operation_param(scenario_param):
+    if isinstance(scenario_param, dict):
+        operation_name  = next(iter(scenario_param))
+        operation_param = scenario_param[operation_name]
+    else:
+        operation_name = scenario_param
+        operation_param = None
+    
+    return operation_name, operation_param
+
+
 def run_connect_to_router(router):
     if not router.open():
         print_bool_result(True,'Fore')
@@ -108,8 +120,29 @@ def run_get_config(router):
         print_bool_result(True,'Fore')
     else:
         print_bool_result(False,'Fore')
-    
     return config
+
+
+def run_validate(router, operation_param, config_before):
+    if operation_param:
+        complies_result = router.validate_operation(operation_param)
+    else:
+        complies_result = router.validate_operation({operation_name:None})
+
+    v_index = complies_result.keys()
+
+    for v in v_index:
+        if v.startswith('get_'):
+            print_bool_result(complies_result[v]['complies'],'Fore')
+            print('Validate {0}'.format(v))
+            
+            if complies_result[v]['complies'] == False:
+                print(Fore.RED + str(complies_result[v]))
+                #print_validate_fail_detail(complies_result[v])
+    
+    if not complies_result['complies']:
+        if not input_judgment('Validate is fail. Continue?'):
+            rollback_operation(router, config_before['running'])
 
 
 def run_scenario(router, senario_filename, param):
@@ -130,38 +163,15 @@ def run_scenario(router, senario_filename, param):
     run_connect_to_router(router)
     print('Connect to ' + router_hostname)
 
-    configu_before = run_get_config(router)
+    config_before = run_get_config(router)
     print('Get config_before of ' + router_hostname)
 
 
     for scenario_param in param['scenario']:
-        if isinstance(scenario_param, dict):
-            operation_name  = next(iter(scenario_param))
-            operation_param = scenario_param[operation_name]
-        else:
-            operation_name = scenario_param
-            operation_param = None
+        operation_name, operation_param = get_operation_param(scenario_param)
 
         if 'validate' == operation_name:
-
-            # Run Validation process
-            if operation_param:
-                complies_result = router.validate_operation(operation_param)
-            else:
-                complies_result = router.validate_operation({operation_name:None})
-
-            pprint(complies_result)
-
-            v_index = complies_result.keys()
-            for v in v_index:
-                if v.startswith('get_'):
-                    print_bool_result(complies_result[v]['complies'],'Fore')
-                    print('validate {0}'.format(v))
-                    if not complies_result[v]['complies']:
-                        print_validate_fail_detail(complies_result[v])
-            if not complies_result['complies']:
-                if not input_judgment('Validate is fail. Continue?'):
-                    rollback_operation(router, config_before['running'])
+            run_validate(router, operation_param, config_before)
 
         elif 'get_' in operation_name:
             print('Get and show command : {0}'.center(50,'=').format(param['hosts']['hostname']))
@@ -200,7 +210,7 @@ def run_scenario(router, senario_filename, param):
                 print(Fore.YELLOW+'[INFO] No changes this router by {0} config'.format(operation_name))
 
         elif operation_name == 'sleep_10sec':
-            print_bool_result(True,'Back')
+            print_bool_result(True,'Fore')
             print('Sleep 10 sec',end='')
             for i in range(10):
                 time.sleep(1)
@@ -211,19 +221,19 @@ def run_scenario(router, senario_filename, param):
 
         elif operation_name == 'rollback':
             rollback_operation(router,config_before['running'])
-            print_bool_result(True,'Back')
+            print_bool_result(True,'Fore')
             print('Rollback Config!', end='')
 
         else:
             print('Cannnot run operation : '+Back.RED + operation_name)
     
     if not router.close():
-        print_bool_result(True,'Back')
+        print_bool_result(True,'Fore')
     else:
-        print_bool_result(False,'Back')
+        print_bool_result(False,'Fore')
     print('Close the connection to ' + param['hosts']['hostname'])
 
-    print('########## End Senario : ' + args.file + ' ##########')
+    print('########## End Senario : ' + senario_filename + ' ##########')
 
 
 def main():
