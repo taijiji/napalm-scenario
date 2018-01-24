@@ -1,27 +1,3 @@
 - get_facts:
-    os_version: 12.1X47-D20.7
-    hostname: firefly1
-- get_interfaces:
-    ge-0/0/0:
-        is_enabled: True
-        is_up: True
-
-    gr-0/0/0:
-        is_enabled: True
-        is_up: True
-
-    ge-0/0/1:
-        is_enabled: True
-        is_up: True
-
-    ge-0/0/2:
-        is_enabled: True
-        is_up: True
-
-    gre:
-        is_enabled: True
-        is_up: True
-
-    lo0:
-        is_enabled: True
-        is_up: True
+    os_version: 12.1X47-D15.4
+    hostname: vsrx1

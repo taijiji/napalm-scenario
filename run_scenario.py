@@ -95,6 +95,22 @@ def load_senario(senario_filename):
     
     return param
 
+def run_connect_to_router(router):
+    if not router.open():
+        print_bool_result(True,'Fore')
+    else :
+        print_bool_result(False,'Fore')
+
+
+def run_get_config(router):
+    config = router.get_config()
+    if config:
+        print_bool_result(True,'Fore')
+    else:
+        print_bool_result(False,'Fore')
+    
+    return config
+
 
 def run_scenario(router, senario_filename, param):
 
@@ -109,22 +125,12 @@ def run_scenario(router, senario_filename, param):
     print('operation_date   : %d'   % (operation_data))
     print('hostname         : %s'   % (router_hostname))
     print('purpose          :\n%s'  % (operation_purpus))
-    
 
-    # Connect to Router
-    if not router.open():
-        print_bool_result(True,'Fore')
-    else :
-        print_bool_result(False,'Fore')
+ 
+    run_connect_to_router(router)
     print('Connect to ' + router_hostname)
-    
 
-    # Get current config of the router
-    config_before = router.get_config()
-    if config_before:
-        print_bool_result(True,'Fore')
-    else:
-        print_bool_result(False,'Fore')
+    configu_before = run_get_config(router)
     print('Get config_before of ' + router_hostname)
 
 
@@ -137,20 +143,18 @@ def run_scenario(router, senario_filename, param):
             operation_param = None
 
         if 'validate' == operation_name:
-            print('Validation Start : {0}'.center(50,'=').format(param['hosts']['hostname']))
+
+            # Run Validation process
             if operation_param:
                 complies_result = router.validate_operation(operation_param)
             else:
                 complies_result = router.validate_operation({operation_name:None})
 
-            #pprint(complies_result)
+            pprint(complies_result)
 
-            print_bool_result(complies_result['complies'],'Back')
-            print('Validation total result')
             v_index = complies_result.keys()
             for v in v_index:
                 if v.startswith('get_'):
-                    print(' '*4 , end='')
                     print_bool_result(complies_result[v]['complies'],'Fore')
                     print('validate {0}'.format(v))
                     if not complies_result[v]['complies']:

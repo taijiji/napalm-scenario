@@ -14,12 +14,12 @@ hosts:
 scenario:
   - validate:
       - facts:
-          version: 12.1X47-D20.7
-          hostname: firefly1
-      - bgp_summary
-      - interfaces :
-          admin: True
-          physical: True
+          version: 12.1X47-D15.4
+          hostname: vsrx1
+#      - bgp_summary
+#      - interfaces :
+#          admin: True
+#          physical: True
 #  - set_add_interface_ipv4:
 #      interface_name: ge-0/0/2
 #      interface_address: 192.168.100.1
