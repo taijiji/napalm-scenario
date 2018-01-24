@@ -3,10 +3,10 @@ purpus:
   拠点Aでプライベートピアを構築することを目的としている。
   経路交換は1経路ずつ受信/送信を行う予定であり、作業による
   ネットワークの影響は軽微であることを想定している。
-operator: ToshiyaMabuchi
-operation_date: 20161115
+operator: Taiji Tsuchiya
+operation_date: 20180125
 hosts:
-  management_ipaddress: 192.168.44.2
+  management_ipaddress: 192.168.33.2
   hostname: iosxrv1
   os : iosxr
   username: user1

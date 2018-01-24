@@ -71,23 +71,10 @@ def rollback_operation(device,config):
         device.close()
         sys.exit()
 
-def main():
-    """main function."""
-
-    # Parse argment
-    parser = ArgumentParser(description='run scenario_file')
-    parser.add_argument('-f', '--file',
-                        type=str,
-                        help='scenario file',
-                        required=True)
-    args = parser.parse_args()
-
-    # Set color font
-    colorama.init(autoreset=True)
-
-    # Read router infomation file
+def load_senario(senario_filename):
+    # Read senario file
     try:
-        with open(args.file, 'r') as f:
+        with open(senario_filename, 'r') as f:
             param_yaml = f.read()
     except (IOError, IndexError):
         sys.stderr.write('Cannot open file : ' + args.file + '\n')
@@ -101,6 +88,22 @@ def main():
         sys.stderr.write(param_yaml)
         sys.stderr.write(str(error))
         sys.exit(1)
+    
+    return param
+
+
+def main():
+    """main function."""
+    # Set color font
+    colorama.init(autoreset=True)
+
+    # Parse argment
+    parser = ArgumentParser(description='run scenario_file')
+    parser.add_argument('-f', '--file', type=str,
+                        help='scenario file', required=True)
+    args = parser.parse_args()
+
+    param = load_senario(args.file)
 
     router1 = Router(
         hostname    = param['hosts']['hostname'],
@@ -139,7 +142,7 @@ def main():
             operation_param = None
 
         if 'validate' == operation_name:
-            print('Pre-Validation Start : {0}'.center(50,'=').format(param['hosts']['hostname']))
+            print('Validation Start : {0}'.center(50,'=').format(param['hosts']['hostname']))
             if operation_param:
                 complies_result = router1.validate_operation(operation_param)
             else:
