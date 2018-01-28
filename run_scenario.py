@@ -132,6 +132,7 @@ def run_validate(router, operation_param, config_before):
     v_index = complies_result.keys()
 
     for v in v_index:
+
         if v == 'get_facts':
             print_bool_result(complies_result[v]['complies'],'Fore')
             print('Validate {0}'.format(v))

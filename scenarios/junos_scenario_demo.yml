@@ -1,8 +1,12 @@
 purpus:
-    本作業は、株式会社AAA(AS65001)が運用するルータと、
-    拠点Aでプライベートピアを構築することを目的としている。
-    経路交換は1経路ずつ受信/送信を行う予定であり、作業による
-    ネットワークの影響は軽微である。
+  The target of this operation is make Private Peer (PNI) 
+  with a router which operated by AAA company in PoP A.
+  It has plan to exchange each 1 route.
+  Its effection is really small.
+  本作業は、株式会社AAA(AS65001)が運用するルータと、
+  拠点Aでプライベートピアを構築することを目的としている。
+  経路交換は1経路ずつ受信/送信を行う予定であり、作業による
+  ネットワークの影響は軽微である。
 operator: Taiji Tsuciya
 operation_date: 20180125
 hosts:
@@ -16,7 +20,7 @@ scenario:
       - facts:
           version: 12.1X47-D15.4
           hostname: vsrx1
-      - bgp_summary
+#      - bgp_summary
 #      - interfaces :
 #          admin: True
 #          physical: True
